@@ -6,6 +6,7 @@ from config import config
 try:
     import RPi.GPIO as GPIO
 except (ImportError, RuntimeError):
+    print(config.IS_RASPBERRYPI)
     print("Running on non-Raspberry Pi hardware. Using mock GPIO library.")
 
 
