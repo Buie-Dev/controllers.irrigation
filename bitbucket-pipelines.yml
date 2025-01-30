@@ -1,0 +1,12 @@
+image: atlassian/default-image:latest
+
+pipelines:
+  branches:
+    production:
+      - step:
+          name: Deploy to Raspberry Pi
+          script:
+            - echo "Deploying to Raspberry Pi..."
+            - ssh-keyscan -H 10.0.0.198 >> ~/.ssh/known_hosts
+            - scp -r * pi@irrigation.local:/home/pi
+            - ssh pi@irrigation.local "cd /home/pi && ./deploy.sh"
