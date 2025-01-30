@@ -13,7 +13,7 @@ class Config:
     MQTT_PORT = int(os.getenv("MQTT_PORT"))
     DEVICE_NAME = os.getenv("DEVICE_NAME")
 
-    IS_RASPBERRYPI = os.getenv("ENVIRONEMNT") == "raspberry_pi"
+    IS_RASPBERRYPI = os.getenv("ENVIRONMENT") == "raspberry_pi"
 
 
 # Export the configuration object for importing
