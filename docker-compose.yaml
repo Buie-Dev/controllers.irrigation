@@ -1,19 +1,10 @@
 version: '3.8'
 
-networks:
-  home-server:
-    driver: bridge
-    name: home-server
-    external: true 
-
-
 
 services:
   irrigation-controller:
     build: .
     container_name: irrigation-controller
-    networks:
-      - home-server
     environment:
       CONFIG_FILE: /run/secrets/config.json
     volumes:
