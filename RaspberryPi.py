@@ -1,0 +1,46 @@
+import time
+from typing import Optional
+
+from config import config
+
+try:
+    import RPi.GPIO as GPIO
+except (ImportError, RuntimeError):
+    print("Running on non-Raspberry Pi hardware. Using mock GPIO library.")
+
+
+class RaspberryPi:
+    pin_numbers = [8, 9, 7, 0, 2, 3, 12, 13, 15, 16, 1, 4, 5, 6, 10, 11]
+
+    def __init__(self):
+        if config.IS_RASPBERRYPI:
+            GPIO.setmode(GPIO.BCM)  # Use BCM numbering
+            for pin in self.pin_numbers:
+                GPIO.setup(pin, GPIO.OUT)  # Set all as output
+
+    def turn_all_off(self):
+        self.active_zone = None
+        for pin in self.pin_numbers:
+            if config.IS_RASPBERRYPI:
+                GPIO.output(pin, GPIO.HIGH)
+            else:
+                print(f"TURNING OFF PIN {pin}")
+
+    def turn_on_relay(self, zone: int):
+
+        self.turn_all_off()
+        pin_number = self.pin_numbers[zone - 1]
+
+        if config.IS_RASPBERRYPI:
+            GPIO.output(pin_number, GPIO.HIGH)
+        else:
+            print(f"TURNING ON ZONE {zone}: GPIO {pin_number}")
+
+    def turn_off_relay(self, zone: int):
+
+        pin_number = self.pin_numbers[zone - 1]
+
+        if config.IS_RASPBERRYPI:
+            GPIO.output(pin_number, GPIO.LOW)
+        else:
+            print(f"TURNING OFF ZONE {zone}: GPIO {pin_number}")
