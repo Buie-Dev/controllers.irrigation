@@ -1,13 +1,11 @@
 from time import sleep
 
-from shared import lock, pq
+from shared import pq
 
 
 def controller():
 
     while True:
 
-        with lock:
-            pq.display()
-            pq.run()
-            sleep(0.1)
+        pq.run()
+        sleep(0.1)

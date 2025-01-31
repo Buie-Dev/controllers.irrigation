@@ -37,7 +37,7 @@ def health_check_response(client):
 
 # Callback when a message is received from the broker
 def on_message(client, userdata, msg):
-    print(f"Received message: {msg.payload.decode()} on topic {msg.topic}")
+    # print(f"Received message: {msg.payload.decode()} on topic {msg.topic}")
     try:
 
         if msg.topic == TOPIC_SUB_IRRIGATION_REQUEST:
@@ -50,8 +50,7 @@ def on_message(client, userdata, msg):
 
             item = QueueItem(item_id, duration, zone, priority, sub_zones)
 
-            with lock:
-                pq.insert_new_item(item)
+            pq.insert_new_item(item)
         elif msg.topic == TOPIC_SUB_HEALTH_CHECK_REQUEST:
             health_check_response(client)
 
@@ -76,5 +75,4 @@ def run_mqtt():
         client.loop_start()
 
     finally:
-
-        print("Disconnected from broker")
+        pass

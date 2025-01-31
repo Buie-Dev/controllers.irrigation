@@ -66,36 +66,24 @@ class PriorityQueue:
 
         if item.duration <= 0:
             self.raspberry_pi.turn_off_relay(item.zone)
-            print("removing item")
             self.remove_item(item)
 
     def insert_new_item(self, item: QueueItem):
-        print("Inserting new item")
-        item.print_item()
         current_item = self.queue
         if current_item is None:
             self.queue = item
             return
 
         while current_item is not None:
-            current_item.print_item()
 
             if current_item.priority > item.priority:
-                print("Addind a less priority")
-                print("Here ----------1")
                 if current_item.prev is not None:
                     current_item.prev.next = item
                 else:
                     self.queue = item
-
-                print("Here ----------2")
                 item.next = current_item
-                print("Here ----------3")
                 item.prev = current_item.prev
-                print("Here ----------4")
                 current_item.prev = item
-                print("Here ----------5")
-                self.display()
                 return
 
             elif current_item.next == None:
@@ -104,7 +92,6 @@ class PriorityQueue:
                 return
             else:
                 current_item = current_item.next
-        print("Done")
 
     def display(self):
 
@@ -120,30 +107,20 @@ class PriorityQueue:
         current_item = self.queue
         while current_item is not None:
             if current_item.id == item.id:
-                print("Foind itme")
                 if current_item.next is not None:
-                    print("Has Next")
                     current_item.next.prev = current_item.prev
 
                 if current_item.prev is not None:
-                    print("Has NPrev")
                     current_item.prev.next = current_item.next
                 else:
                     self.queue = current_item.next
 
                 if current_item.next == current_item.prev:
-
-                    print("Empythin queue")
                     self.queue = None
 
                 current_item.next = None
 
                 current_item.prev = None
-                print("-------------")
-
-                self.display()
-
-                print("-------- DONE ----------")
                 return
 
             current_item = current_item.next
