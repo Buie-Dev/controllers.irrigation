@@ -21,9 +21,10 @@ class RaspberryPi:
 
     def turn_all_off(self):
         self.active_zone = None
+        print("TURNING OFF ALL RELAY")
         for pin in self.pin_numbers:
             if config.IS_RASPBERRYPI:
-                GPIO.output(pin, GPIO.HIGH)
+                GPIO.output(pin, GPIO.LOW)
             else:
                 print(f"TURNING OFF PIN {pin}")
 
@@ -42,6 +43,7 @@ class RaspberryPi:
         pin_number = self.pin_numbers[zone - 1]
 
         if config.IS_RASPBERRYPI:
+            print("TURNING OFF RELAY")
             GPIO.output(pin_number, GPIO.LOW)
         else:
             print(f"TURNING OFF ZONE {zone}: GPIO {pin_number}")
