@@ -11,13 +11,14 @@ except (ImportError, RuntimeError):
 
 
 class RaspberryPi:
-    pin_numbers = [8, 9, 7, 0, 2, 3, 12, 13, 15, 16, 1, 4, 5, 6, 10, 11]
+    pin_numbers = [2, 3, 4, 17, 27, 22, 10, 9]
 
     def __init__(self):
         if config.IS_RASPBERRYPI:
             GPIO.setmode(GPIO.BCM)  # Use BCM numbering
             for pin in self.pin_numbers:
                 GPIO.setup(pin, GPIO.OUT)  # Set all as output
+                GPIO.output(pin, GPIO.HIGH)
 
     def turn_all_off(self):
         self.active_zone = None
