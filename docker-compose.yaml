@@ -12,4 +12,5 @@ services:
       - .env 
     restart: always  # Restart if the container crashes
     command: ["python", "index.py"]
+    privileged: true
 
