@@ -75,13 +75,6 @@ def run_mqtt():
         client.connect(config.MQTT_BROKER, config.MQTT_PORT, 60)
         client.loop_start()
 
-        # Keep the script running to listen for incoming messages
-        # input("Press Enter to exit...\n")
-        while True:
-            pass
-
     finally:
-        # Disconnect gracefully
-        client.loop_stop()
-        client.disconnect()
+
         print("Disconnected from broker")

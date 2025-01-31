@@ -1,6 +1,0 @@
-Metadata-Version: 2.1
-Name: my_project
-Version: 1.0.0
-Requires-Dist: paho-mqtt
-Requires-Dist: python-dotenv
-Requires-Dist: RPi.GPIO
