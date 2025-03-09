@@ -18,6 +18,14 @@ sub_topics = [
     TOPIC_SUB_IRRIGATION_REQUEST,
 ]
 
+print(
+    "CONFIG.MQTT",
+    config.MQTT_BROKER,
+    config.MQTT_PASSWORD,
+    config.MQTT_PORT,
+    config.MQTT_USERNAME,
+)
+
 
 # Callback when the client connects to the broker
 def on_connect(client, userdata, flags, rc):
