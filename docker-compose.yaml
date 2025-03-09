@@ -2,6 +2,7 @@
 
 services:
   irrigation-controller:
+    network_mode: "host"
     build: .
     container_name: irrigation-controller
     environment:
