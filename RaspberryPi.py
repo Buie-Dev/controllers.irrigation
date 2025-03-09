@@ -1,6 +1,6 @@
 import time
 from typing import Optional
-
+from shared import DESIRED_STATE
 from config import config
 
 try:
@@ -48,3 +48,17 @@ class RaspberryPi:
             GPIO.output(pin_number, GPIO.HIGH)
         else:
             print(f"TURNING OFF ZONE {zone}: GPIO {pin_number}")
+
+    def set_relays(self):
+        for index, zone in enumerate(DESIRED_STATE):
+            print("Index", index)
+            print("Zone", zone)
+            pin_number = self.pin_numbers[index]
+
+            if config.IS_RASPBERRYPI:
+                GPIO.output(pin_number, zone["state"])
+            else:
+
+                print(
+                    f"SETTING ZONE {zone['id']}: GPIO {pin_number} TO {zone['state']}"
+                )

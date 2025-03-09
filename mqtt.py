@@ -5,16 +5,15 @@ import paho.mqtt.client as mqtt
 
 from config import config
 from PriorityQueue import QueueItem
-from shared import lock, pq
+from shared import pq, DESIRED_STATE
 
 TOPIC_SUB_IRRIGATION_REQUEST = "irrigation/request"
-TOPIC_SUB_HEALTH_CHECK_REQUEST = "healthcheck/request"  # Topic to subscribe to
-TOPIC_SUB_HEALTH_CHECK_RESPONSE = "healthcheck/response"
+TOPIC_SUB_HEALTH_CHECK_REQUEST = "healthcheck/request"
 
 TOPIC_PUB_HEALTH_CHECK_RESPONSE = "healthcheck/response"  # Topic to publish to
+TOBIC_PUB_CURRENT_STATE = "irrigation/currentState"
 
 sub_topics = [
-    TOPIC_SUB_HEALTH_CHECK_RESPONSE,
     TOPIC_SUB_HEALTH_CHECK_REQUEST,
     TOPIC_SUB_IRRIGATION_REQUEST,
 ]
@@ -24,6 +23,7 @@ sub_topics = [
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
         print("Connected successfully to broker!")
+        publish_current_state(client)
         for topic in sub_topics:
             client.subscribe(topic)  # Subscribe to a topic after connecting
     else:
@@ -35,20 +35,33 @@ def health_check_response(client):
     client.publish(TOPIC_PUB_HEALTH_CHECK_RESPONSE, json.dumps(payload))
 
 
+def publish_message(client, topic, payload):
+    try:
+        message = json.dumps(payload)
+        client.publish(topic, message)
+        print(f"Published to {topic}: {message}")
+    except Exception as e:
+        print(f"Error publishing message: {e}")
+
+
+def publish_current_state(client):
+    publish_message(client, TOBIC_PUB_CURRENT_STATE, DESIRED_STATE)
+
+
 # Callback when a message is received from the broker
 def on_message(client, userdata, msg):
     # print(f"Received message: {msg.payload.decode()} on topic {msg.topic}")
     try:
-
+        print(msg.topic, msg.payload)
         if msg.topic == TOPIC_SUB_IRRIGATION_REQUEST:
             payload = json.loads(msg.payload.decode())
             item_id = uuid.uuid4()
             duration = payload["duration"]
             zone = payload["zone"]
             priority = payload["priority"]
-            sub_zones = payload.get("sub_zones")
+            subzones = payload.get("subzones")
 
-            item = QueueItem(item_id, duration, zone, priority, sub_zones)
+            item = QueueItem(item_id, duration, zone, priority, subzones)
 
             pq.insert_new_item(item)
         elif msg.topic == TOPIC_SUB_HEALTH_CHECK_REQUEST:
@@ -69,10 +82,10 @@ def create_mqtt_client():
 def run_mqtt():
     try:
         client = create_mqtt_client()
-
         print(f"Connecting to broker {config.MQTT_BROKER} on port {config.MQTT_PORT}")
         client.connect(config.MQTT_BROKER, config.MQTT_PORT, 60)
         client.loop_start()
+        return client
 
     finally:
         pass

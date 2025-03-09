@@ -1,8 +1,6 @@
 import time
 from typing import List, Optional, Union
 
-from RaspberryPi import RaspberryPi
-
 
 class QueueItem:
 
@@ -12,13 +10,13 @@ class QueueItem:
         duration: float,
         zone: int,
         priority: int,
-        sub_zones=Optional[List[Union[int, str]]],
+        subzones=Optional[List[Union[int, str]]],
     ):
         self.id = id
         self.duration = duration
         self.zone = zone
         self.priority = priority
-        self.sub_zones = sub_zones
+        self.subzones = subzones
         self.next = None
         self.prev = None
         self.start_time = None
@@ -39,34 +37,34 @@ class QueueItem:
 
 class PriorityQueue:
     queue = None
-    raspberry_pi = RaspberryPi()
+    # raspberry_pi = RaspberryPi()
 
-    def run(self):
-        item = self.queue
-        if item == None:
-            return
+    # def run(self):
+    #     item = self.queue
+    #     if item == None:
+    #         return
 
-        if item.start_time is None:
-            self.raspberry_pi.turn_on_relay(item.zone)
-            item.start_time = time.time()
-            # stop count on all others zones
-            ri = item.next
-            while ri is not None:
-                ri.start_time = None
-                if ri.start_time is not None:
-                    running_time = time.time() - ri.start_time
-                    ri.duration -= running_time
-                    if ri.duration <= 0:
-                        self.remove_item(item)
-                ri = ri.next
+    #     if item.start_time is None:
+    #         self.raspberry_pi.turn_on_relay(item.zone)
+    #         item.start_time = time.time()
+    #         # stop count on all others zones
+    #         ri = item.next
+    #         while ri is not None:
+    #             ri.start_time = None
+    #             if ri.start_time is not None:
+    #                 running_time = time.time() - ri.start_time
+    #                 ri.duration -= running_time
+    #                 if ri.duration <= 0:
+    #                     self.remove_item(item)
+    #             ri = ri.next
 
-        running_time = time.time() - item.start_time
-        item.duration -= running_time
-        item.start_time = time.time()
+    #     running_time = time.time() - item.start_time
+    #     item.duration -= running_time
+    #     item.start_time = time.time()
 
-        if item.duration <= 0:
-            self.raspberry_pi.turn_off_relay(item.zone)
-            self.remove_item(item)
+    #     if item.duration <= 0:
+    #         self.raspberry_pi.turn_off_relay(item.zone)
+    #         self.remove_item(item)
 
     def insert_new_item(self, item: QueueItem):
         current_item = self.queue
