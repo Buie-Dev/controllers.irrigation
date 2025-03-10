@@ -1,6 +1,5 @@
 import json
 import uuid
-
 import paho.mqtt.client as mqtt
 
 from config import config

@@ -56,7 +56,8 @@ class RaspberryPi:
             pin_number = self.pin_numbers[index]
 
             if config.IS_RASPBERRYPI:
-                GPIO.output(pin_number, zone["state"])
+                state = GPIO.HIGH if zone["state"] == 0 else GPIO.LOW
+                GPIO.output(pin_number, state)
             else:
 
                 print(
