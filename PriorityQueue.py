@@ -1,5 +1,6 @@
 import time
 from typing import List, Optional, Union
+import json
 
 
 class QueueItem:
@@ -22,6 +23,17 @@ class QueueItem:
         self.start_time = None
         self.end_time = None
 
+    def to_object(self):
+        return {
+            "id": self.id,
+            "duration": self.duration,
+            "zone": self.zone,
+            "priority": self.priority,
+            "subzones": self.subzones,
+            "start_time": self.start_time,
+            "end_time": self.end_time,
+        }
+
     def print_item(self):
         print(
             "Id: {}, Zone: {}, Priority: {}, Duration: {}, Next: {}, Prev: {}".format(
@@ -33,6 +45,7 @@ class QueueItem:
                 self.prev.id if self.prev else "None",
             )
         )
+        print("")
 
 
 class PriorityQueue:
@@ -100,11 +113,11 @@ class PriorityQueue:
             ci.print_item()
             ci = ci.next
 
-    def remove_item(self, item: QueueItem):
+    def remove_item(self, item_id):
 
         current_item = self.queue
         while current_item is not None:
-            if current_item.id == item.id:
+            if current_item.id == item_id:
                 if current_item.next is not None:
                     current_item.next.prev = current_item.prev
 
@@ -122,3 +135,16 @@ class PriorityQueue:
                 return
 
             current_item = current_item.next
+
+    def to_json(self) -> list:
+        results = []
+        current_item = self.queue
+        while current_item is not None:
+            results.append(current_item.to_object())
+            current_item = current_item.next
+        return results
+
+    def print(self) -> None:
+        current_item = self.queue
+        while current_item is not None:
+            current_item.print_item()

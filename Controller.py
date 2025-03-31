@@ -4,12 +4,12 @@ import copy
 import json
 from shared import pq, DESIRED_STATE
 from RaspberryPi import RaspberryPi
-from mqtt import publish_current_state
+from mqtt import publish_current_state, publish_queue
 
 CURRENT_STATE = copy.deepcopy(DESIRED_STATE)
 
 
-def item_control(item):
+def item_control(item, mqtt_client):
     if item.start_time is None:
         zone = next((z for z in DESIRED_STATE if z["id"] == item.zone), None)
         if zone:
@@ -19,16 +19,17 @@ def item_control(item):
 
         item.start_time = time.time()
         # stop count on all others zones
-        ri = item.next
+        ri = pq.queue
         while ri is not None:
-            ri.start_time = None
-            if ri.start_time is not None:
+            if ri.start_time is not None and ri.id != item.id:
                 running_time = time.time() - ri.start_time
                 ri.duration -= running_time
+                ri.start_time = None
                 if ri.duration <= 0:
-                    pq.remove_item(item)
+                    pq.remove_item(item.id)
+                    publish_queue(mqtt_client)
             ri = ri.next
-
+    item.print_item()
     running_time = time.time() - item.start_time
     item.duration -= running_time
     item.start_time = time.time()
@@ -41,7 +42,8 @@ def item_control(item):
             if subzones is not None:
                 for subzone in subzones:
                     subzone["state"] = 0
-        pq.remove_item(item)
+        pq.remove_item(item.id)
+        publish_queue(mqtt_client)
 
 
 def controller(mqtt_client):
@@ -54,7 +56,7 @@ def controller(mqtt_client):
             sleep(0.1)
             continue
 
-        item_control(item)
+        item_control(item, mqtt_client)
 
         current_state_string = json.dumps(CURRENT_STATE, sort_keys=True)
         desired_state_string = json.dumps(DESIRED_STATE, sort_keys=True)
