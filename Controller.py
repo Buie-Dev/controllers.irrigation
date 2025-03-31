@@ -18,17 +18,17 @@ def item_control(item, mqtt_client):
                 zone["subzones"] = copy.deepcopy(item.subzones)
 
         item.start_time = time.time()
-        # stop count on all others zones
-        ri = pq.queue
-        while ri is not None:
-            if ri.start_time is not None and ri.id != item.id:
-                running_time = time.time() - ri.start_time
-                ri.duration -= running_time
-                ri.start_time = None
-                if ri.duration <= 0:
+
+        current_item = pq.queue
+        while current_item is not None:
+            if current_item.start_time is not None and current_item.id != item.id:
+                running_time = time.time() - current_item.start_time
+                current_item.duration -= running_time
+                current_item.start_time = None
+                if current_item.duration <= 0:
                     pq.remove_item(item.id)
                     publish_queue(mqtt_client)
-            ri = ri.next
+            current_item = current_item.next
     item.print_item()
     running_time = time.time() - item.start_time
     item.duration -= running_time

@@ -136,6 +136,13 @@ class PriorityQueue:
 
             current_item = current_item.next
 
+    def remove_all(self):
+        current_item = self.queue
+        while current_item is not None:
+            next_item = current_item.next
+            self.remove_item(current_item.id)
+            current_item = next_item
+
     def to_json(self) -> list:
         results = []
         current_item = self.queue

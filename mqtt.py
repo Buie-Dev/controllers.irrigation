@@ -8,6 +8,7 @@ from shared import pq, DESIRED_STATE
 
 TOPIC_SUB_IRRIGATION_REQUEST = "irrigation/request"
 TOPIC_SUB_IRRIGATION_STOP = "irrigation/stop"
+TOPIC_SUB_IRRIGATION_STOP_ALL = "irrigation/stopAll"
 TOPIC_SUB_HEALTH_CHECK_REQUEST = "healthcheck/request"
 
 TOPIC_PUB_HEALTH_CHECK_RESPONSE = "healthcheck/response"  # Topic to publish to
@@ -18,6 +19,7 @@ sub_topics = [
     TOPIC_SUB_HEALTH_CHECK_REQUEST,
     TOPIC_SUB_IRRIGATION_REQUEST,
     TOPIC_SUB_IRRIGATION_STOP,
+    TOPIC_SUB_IRRIGATION_STOP_ALL,
 ]
 
 print(
@@ -82,6 +84,9 @@ def on_message(client, userdata, msg):
             payload = json.loads(msg.payload.decode())
             item_id = payload["id"]
             pq.remove_item(item_id)
+            publish_queue(client)
+        elif msg.topic == TOPIC_SUB_IRRIGATION_STOP_ALL:
+            pq.remove_all()
             publish_queue(client)
         elif msg.topic == TOPIC_SUB_HEALTH_CHECK_REQUEST:
             health_check_response(client)
