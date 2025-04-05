@@ -58,7 +58,7 @@ def publish_message(client, topic, payload, retain=False):
 
 
 def publish_current_state(client):
-    publish_message(client, TOBIC_PUB_CURRENT_STATE, DESIRED_STATE)
+    publish_message(client, TOBIC_PUB_CURRENT_STATE, DESIRED_STATE, True)
 
 
 def publish_queue(client):
@@ -83,10 +83,10 @@ def on_message(client, userdata, msg):
         elif msg.topic == TOPIC_SUB_IRRIGATION_STOP:
             payload = json.loads(msg.payload.decode())
             item_id = payload["id"]
-            pq.remove_item(item_id)
+            pq.set_remove_item_state(item_id)
             publish_queue(client)
         elif msg.topic == TOPIC_SUB_IRRIGATION_STOP_ALL:
-            pq.remove_all()
+            pq.set_remove_all_state()
             publish_queue(client)
         elif msg.topic == TOPIC_SUB_HEALTH_CHECK_REQUEST:
             health_check_response(client)

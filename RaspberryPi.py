@@ -51,15 +51,12 @@ class RaspberryPi:
 
     def set_relays(self):
         for index, zone in enumerate(DESIRED_STATE):
-            print("Index", index)
-            print("Zone", zone)
             pin_number = self.pin_numbers[index]
 
             if config.IS_RASPBERRYPI:
                 state = GPIO.HIGH if zone["state"] == 0 else GPIO.LOW
                 GPIO.output(pin_number, state)
             else:
-
                 print(
                     f"SETTING ZONE {zone['id']}: GPIO {pin_number} TO {zone['state']}"
                 )

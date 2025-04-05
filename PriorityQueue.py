@@ -22,6 +22,7 @@ class QueueItem:
         self.prev = None
         self.start_time = None
         self.end_time = None
+        self.remove = False
 
     def to_object(self):
         return {
@@ -36,13 +37,14 @@ class QueueItem:
 
     def print_item(self):
         print(
-            "Id: {}, Zone: {}, Priority: {}, Duration: {}, Next: {}, Prev: {}".format(
+            "Id: {}, Zone: {}, Priority: {}, Duration: {}, Next: {}, Prev: {}, Remove: {}".format(
                 self.id,
                 self.zone,
                 self.priority,
                 self.duration,
                 self.next.id if self.next else "None",
                 self.prev.id if self.prev else "None",
+                self.remove,
             )
         )
         print("")
@@ -136,6 +138,20 @@ class PriorityQueue:
 
             current_item = current_item.next
 
+    def set_remove_item_state(self, item_id):
+        current_item = self.queue
+        while current_item is not None:
+            if current_item.id == item_id:
+                current_item.remove = True
+                break
+
+    def set_remove_all_state(self):
+        print("removing all")
+        current_item = self.queue
+        while current_item is not None:
+            current_item.remove = True
+            current_item = current_item.next
+
     def remove_all(self):
         current_item = self.queue
         while current_item is not None:
@@ -153,5 +169,8 @@ class PriorityQueue:
 
     def print(self) -> None:
         current_item = self.queue
+        if current_item is None:
+            print(" Priority Queue is Empty")
         while current_item is not None:
             current_item.print_item()
+            current_item = current_item.next
