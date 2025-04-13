@@ -62,7 +62,7 @@ def publish_current_state(client):
 
 
 def publish_queue(client):
-    publish_message(client, TOBIC_PUB_IRRIGATION_QUEUE, pq.to_json())
+    publish_message(client, TOBIC_PUB_IRRIGATION_QUEUE, pq.to_json(), True)
 
 
 # Callback when a message is received from the broker

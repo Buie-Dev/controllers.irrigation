@@ -56,14 +56,18 @@ def item_control(item, mqtt_client):
 
         # Set zone and subzones
         zone["state"] = 1
-        if item.subzones is not None:
-            zone["subzones"] = copy.deepcopy(item.subzones)
+
+        if item.subzones is not None and zone["subzones"] is not None:
+            item_subzones_dict = {sz["id"]: sz["state"] for sz in item.subzones}
+            for sz in zone["subzones"]:
+                sz_id = sz.get("id")
+                sz["state"] = item_subzones_dict.get(sz_id, 0)
 
         item.start_time = time.time()
 
         turn_stop_time_off_other_queue_items(item, mqtt_client)
         turn_off_other_relays(item)
-
+        publish_queue(mqtt_client)
 
     running_time = time.time() - item.start_time
     item.duration -= running_time
@@ -88,7 +92,7 @@ def broadcast_changes(mqtt_client):
         rp.set_relays()
 
 
-def controller(mqtt_client):
+def controller(mqtt_client) -> None:
 
     while True:
         # pq.run()
@@ -101,6 +105,7 @@ def controller(mqtt_client):
             turn_off_relay(item)
             pq.remove_item(item.id)
             broadcast_changes(mqtt_client)
+            publish_queue(mqtt_client)
             sleep(0.1)
             continue
 
@@ -110,11 +115,10 @@ def controller(mqtt_client):
             current_item = next_item
             next_item = next_item.next
             if current_item.remove:
-                turn_off_relay(item)
                 pq.remove_item(current_item.id)
+                publish_queue(mqtt_client)
 
         item_control(item, mqtt_client)
-
         broadcast_changes(mqtt_client)
 
         sleep(1)
