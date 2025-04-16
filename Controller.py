@@ -57,7 +57,7 @@ def item_control(item, mqtt_client):
         # Set zone and subzones
         zone["state"] = 1
 
-        if item.subzones is not None and zone["subzones"] is not None:
+        if item.subzones is not None and zone.get("subzones") is not None:
             item_subzones_dict = {sz["id"]: sz["state"] for sz in item.subzones}
             for sz in zone["subzones"]:
                 sz_id = sz.get("id")
