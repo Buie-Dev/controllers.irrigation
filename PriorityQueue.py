@@ -71,6 +71,7 @@ class PriorityQueue:
             if current_item.id == item_id:
                 current_item.remove = True
                 break
+            current_item = current_item.next
 
     def set_remove_all_state(self) -> None:
         current_item = self.queue
