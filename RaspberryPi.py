@@ -39,6 +39,7 @@ class RaspberryPi:
         if config.IS_RASPBERRYPI:
             GPIO.setmode(GPIO.BCM)  # Use BCM numbering
             for pin in self.pin_numbers:
+                print(f"Setting PINS: {pin}")
                 GPIO.setup(pin, GPIO.OUT)  # Set all as output
                 GPIO.output(pin, GPIO.HIGH)
 
