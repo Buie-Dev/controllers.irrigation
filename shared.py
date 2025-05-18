@@ -3,6 +3,7 @@ from PriorityQueue import PriorityQueue
 # Shared variable
 pq = PriorityQueue()
 DESIRED_STATE = [
+    # Upper Level
     {"id": 1, "state": 0},
     {"id": 2, "state": 0},
     {"id": 3, "state": 0},
@@ -15,11 +16,16 @@ DESIRED_STATE = [
     {"id": 10, "state": 0},
     {"id": 11, "state": 0},
     {"id": 12, "state": 0},
+    # Lower level
     {"id": 13, "state": 0},
     {"id": 14, "state": 0},
     {"id": 15, "state": 0},
+    {"id": 16, "state": 0},
+    {"id": 17, "state": 0},
+    {"id": 18, "state": 0},
+    {"id": 19, "state": 0},
     {
-        "id": 16,
+        "id": 20,
         "state": 0,
         "subzones": [
             {"id": 1, "state": 0},
