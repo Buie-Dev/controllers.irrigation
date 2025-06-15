@@ -12,7 +12,7 @@ class QueueItem:
         subzones=Optional[List[Union[int, str]]],
     ):
         self.id = id
-        self.duration = duration
+        self.duration = int(duration * 60)
         self.zone = zone
         self.priority = priority
         self.subzones = subzones
