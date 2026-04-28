@@ -1,25 +1,32 @@
 import json
+import time
 import uuid
 import paho.mqtt.client as mqtt
 
 from config import config
 from PriorityQueue import QueueItem
-from shared import pq, DESIRED_STATE
+from shared import pq, DESIRED_STATE, flow_tracker
 
 TOPIC_SUB_IRRIGATION_REQUEST = "irrigation/request"
 TOPIC_SUB_IRRIGATION_STOP = "irrigation/stop"
 TOPIC_SUB_IRRIGATION_STOP_ALL = "irrigation/stopAll"
 TOPIC_SUB_HEALTH_CHECK_REQUEST = "healthcheck/request"
+TOPIC_SUB_FLOW = "irrigation/flow"
+
+FLOW_SENSOR_NAME = "nodemcu_irrigation_flow_sensor"
+DEDICATED_LINE_SENSOR_NAME = "nodemcu_dedicated_line_flow_sensor"
 
 TOPIC_PUB_HEALTH_CHECK_RESPONSE = "healthcheck/response"  # Topic to publish to
 TOBIC_PUB_CURRENT_STATE = "irrigation/currentState"
 TOBIC_PUB_IRRIGATION_QUEUE = "irrigation/queue"
+TOPIC_PUB_LIVE_FLOW = "irrigation/liveFlow"
 
 sub_topics = [
     TOPIC_SUB_HEALTH_CHECK_REQUEST,
     TOPIC_SUB_IRRIGATION_REQUEST,
     TOPIC_SUB_IRRIGATION_STOP,
     TOPIC_SUB_IRRIGATION_STOP_ALL,
+    TOPIC_SUB_FLOW,
 ]
 
 print(
@@ -65,6 +72,10 @@ def publish_queue(client):
     publish_message(client, TOBIC_PUB_IRRIGATION_QUEUE, pq.to_json(), True)
 
 
+def publish_live_flow(client, item_id, litres):
+    publish_message(client, TOPIC_PUB_LIVE_FLOW, {"id": item_id, "litres": round(litres, 3)})
+
+
 # Callback when a message is received from the broker
 def on_message(client, userdata, msg):
     # print(f"Received message: {msg.payload.decode()} on topic {msg.topic}")
@@ -90,6 +101,16 @@ def on_message(client, userdata, msg):
             publish_queue(client)
         elif msg.topic == TOPIC_SUB_HEALTH_CHECK_REQUEST:
             health_check_response(client)
+        elif msg.topic == TOPIC_SUB_FLOW:
+            payload = json.loads(msg.payload.decode())
+            sensor = payload.get("sensor")
+            pulse_count = payload.get("pulse_count", 0)
+            if sensor == FLOW_SENSOR_NAME:
+                running_item = pq.queue
+                if running_item is not None and running_item.start_time is not None:
+                    flow_tracker.add_irrigation_pulses(pulse_count)
+            elif sensor == DEDICATED_LINE_SENSOR_NAME:
+                flow_tracker.add_dedicated_pulses(pulse_count)
 
     except json.JSONDecodeError:
         print(f"Received non-JSON message: {msg.payload.decode()} on topic {msg.topic}")
@@ -104,12 +125,14 @@ def create_mqtt_client():
 
 
 def run_mqtt():
-    try:
-        client = create_mqtt_client()
-        print(f"Connecting to broker {config.MQTT_BROKER} on port {config.MQTT_PORT}")
-        client.connect(config.MQTT_BROKER, config.MQTT_PORT, 60)
-        client.loop_start()
-        return client
-
-    finally:
-        pass
+    client = create_mqtt_client()
+    while True:
+        try:
+            print(f"Connecting to broker {config.MQTT_BROKER}:{config.MQTT_PORT}...")
+            client.connect(config.MQTT_BROKER, config.MQTT_PORT, 60)
+            break
+        except Exception as e:
+            print(f"MQTT connect failed: {e} — retrying in 5s")
+            time.sleep(5)
+    client.loop_start()
+    return client

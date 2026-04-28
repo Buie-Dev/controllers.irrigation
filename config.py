@@ -15,6 +15,8 @@ class Config:
 
     IS_RASPBERRYPI = os.getenv("ENVIRONMENT") == "raspberry_pi"
 
+    API_URL = os.getenv("API_URL", "http://localhost:5001")
+
 
 # Export the configuration object for importing
 config = Config()

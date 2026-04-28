@@ -21,6 +21,7 @@ class QueueItem:
         self.start_time = None
         self.end_time = None
         self.remove = False
+        self.actual_start_datetime = None
 
     def to_object(self):
         return {
