@@ -3,7 +3,9 @@
 services:
   irrigation-controller:
     network_mode: "host"
-    build: .
+    build:
+      context: .
+      network: host
     container_name: irrigation-controller
     environment:
       CONFIG_FILE: /run/secrets/config.json
