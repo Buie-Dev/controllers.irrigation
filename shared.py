@@ -8,6 +8,7 @@ class FlowTracker:
         self.irrigation_pulses = 0
         self.dedicated_pulses = 0
         self.dedicated_start_dt = None
+        self.dedicated_last_flow_dt = None
         self.dedicated_first_flow_time = None
         self.last_dedicated_flow_time = None
 
@@ -24,14 +25,16 @@ class FlowTracker:
             self.dedicated_start_dt = datetime.now()
             self.dedicated_first_flow_time = time.time()
         self.dedicated_pulses += count
+        self.dedicated_last_flow_dt = datetime.now()
         self.last_dedicated_flow_time = time.time()
 
     def flush_dedicated(self):
-        """Returns (pulses, start_dt, end_dt, duration_s) and resets state."""
-        duration_s = self.last_dedicated_flow_time - self.dedicated_first_flow_time
-        data = (self.dedicated_pulses, self.dedicated_start_dt, datetime.now(), duration_s)
+        """Returns (pulses, start_dt, end_dt) and resets state.
+        end_dt is when water last flowed, not when the timeout fired."""
+        data = (self.dedicated_pulses, self.dedicated_start_dt, self.dedicated_last_flow_dt)
         self.dedicated_pulses = 0
         self.dedicated_start_dt = None
+        self.dedicated_last_flow_dt = None
         self.dedicated_first_flow_time = None
         self.last_dedicated_flow_time = None
         return data

@@ -11,15 +11,23 @@ from mqtt import publish_current_state, publish_queue, publish_live_flow
 from config import config
 
 FLOW_PULSES_PER_LITRE = 330  # Digiten FL-608: F = 5.5 * Q (L/min) → 330 pulses/L
-DEDICATED_LINE_TIMEOUT_S = 60
+DEDICATED_LINE_TIMEOUT_S = 1800  # 30 min of no flow before submitting session to history
 MIN_FLOW_DURATION_S = 5
+NO_FLOW_MIN_DURATION_S = 30  # min run time (s) to record history when there is no flow
 
 CURRENT_STATE = copy.deepcopy(DESIRED_STATE)
 rp = RaspberryPi()
 
 
 def submit_history(zone_id, start_dt, end_dt, pulses, subzones=None):
-    if (end_dt - start_dt).total_seconds() < MIN_FLOW_DURATION_S:
+    duration = (end_dt - start_dt).total_seconds()
+    if pulses == 0:
+        if duration < NO_FLOW_MIN_DURATION_S:
+            print(
+                f"Ignoring no-flow run for zone {zone_id}: duration {duration:.1f}s < {NO_FLOW_MIN_DURATION_S}s"
+            )
+            return
+    elif duration < MIN_FLOW_DURATION_S:
         print(
             f"Ignoring phantom flow for zone {zone_id}: duration < {MIN_FLOW_DURATION_S}s"
         )
@@ -129,7 +137,7 @@ def check_dedicated_line_timeout():
         and time.time() - flow_tracker.last_dedicated_flow_time
         > DEDICATED_LINE_TIMEOUT_S
     ):
-        pulses, start_dt, end_dt, duration_s = flow_tracker.flush_dedicated()
+        pulses, start_dt, end_dt = flow_tracker.flush_dedicated()
         if pulses > 0 and start_dt is not None:
             submit_history(None, start_dt, end_dt, pulses)
 
