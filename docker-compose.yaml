@@ -9,6 +9,7 @@ services:
     container_name: irrigation-controller
     environment:
       CONFIG_FILE: /run/secrets/config.json
+      TZ: America/Vancouver
     volumes:
       - .:/app  # Mount current directory to /app in the container
     env_file:

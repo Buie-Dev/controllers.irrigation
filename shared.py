@@ -1,6 +1,7 @@
 import time
 from datetime import datetime
 from PriorityQueue import PriorityQueue
+from date import today
 
 
 class FlowTracker:
@@ -22,16 +23,20 @@ class FlowTracker:
 
     def add_dedicated_pulses(self, count):
         if self.dedicated_start_dt is None:
-            self.dedicated_start_dt = datetime.now()
+            self.dedicated_start_dt = today()
             self.dedicated_first_flow_time = time.time()
         self.dedicated_pulses += count
-        self.dedicated_last_flow_dt = datetime.now()
+        self.dedicated_last_flow_dt = today()
         self.last_dedicated_flow_time = time.time()
 
     def flush_dedicated(self):
         """Returns (pulses, start_dt, end_dt) and resets state.
         end_dt is when water last flowed, not when the timeout fired."""
-        data = (self.dedicated_pulses, self.dedicated_start_dt, self.dedicated_last_flow_dt)
+        data = (
+            self.dedicated_pulses,
+            self.dedicated_start_dt,
+            self.dedicated_last_flow_dt,
+        )
         self.dedicated_pulses = 0
         self.dedicated_start_dt = None
         self.dedicated_last_flow_dt = None
@@ -64,9 +69,8 @@ DESIRED_STATE = [
     {"id": 16, "state": 0},
     {"id": 17, "state": 0},
     {"id": 18, "state": 0},
-    {"id": 19, "state": 0},
     {
-        "id": 20,
+        "id": 19,
         "state": 0,
         "subzones": [
             {"id": 1, "state": 0},
@@ -83,4 +87,5 @@ DESIRED_STATE = [
             {"id": 12, "state": 0},
         ],
     },
+    {"id": 20, "state": 0},
 ]
