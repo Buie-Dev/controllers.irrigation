@@ -1,6 +1,3 @@
-import threading
-import time
-
 from Controller import controller
 from mqtt import run_mqtt
 

@@ -1,5 +1,3 @@
-import time
-from typing import Optional
 from shared import DESIRED_STATE
 from config import config
 

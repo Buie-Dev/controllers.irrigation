@@ -1,6 +1,4 @@
-import time
 from typing import Optional
-import json
 from ObjectTypes import PriorityQueueItem
 from Classes import QueueItem
 
@@ -26,7 +24,7 @@ class PriorityQueue:
                 current_item.prev = item
                 return
 
-            elif current_item.next == None:
+            elif current_item.next is None:
                 current_item.next = item
                 item.prev = current_item
                 return
